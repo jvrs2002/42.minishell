@@ -1,174 +1,206 @@
-# 🐚 Mini-Shell 42
+*This project has been created as part of the 42 curriculum by jvrs2002, vinimoura99.*
+
+# minishell
 
 <div align="center">
 
-**Mini-Shell** is a core project in the **42 School** curriculum. The goal is to recreate a **minimalist UNIX shell** that simulates the behavior of Bash, focusing on the correct implementation of **parsing**, **execution**, **pipelines**, **redirections**, and **built-in commands**, along with managing **environment variables** and handling **signals**.
+**minishell** is a core project in the **42 School** curriculum. The goal is to recreate a minimalist UNIX shell that simulates the behavior of Bash, focusing on parsing, execution, pipelines, redirections, built-in commands, environment variables, and signal handling.
 
 > _"The objective of this project is to create a simple shell, reproducing the behavior of Bash as closely as possible, with a focus on understanding how a shell works internally."_
-
----
-
-<div align="center">
-  <h3>Contributor Stats</h3>
-  
-  <table>
-    <tr>
-      <td align="center">
-        <a href="https://github.com/vinimoura99">
-          <img src="https://github-readme-stats.vercel.app/api?username=vinimoura99&show_icons=true&theme=react&rank_icon=github&hide_rank=true&layout=compact" alt="vinimoura99's GitHub Stats" />
-        </a>
-      </td>
-      <td align="center">
-        <a href="https://github.com/jvrs2002">
-          <img src="https://github-readme-stats.vercel.app/api?username=jvrs2002&show_icons=true&theme=dark&rank_icon=github&hide_rank=true&layout=compact" alt="jvrs2002's GitHub Stats" />
-        </a>
-      </td>
-    </tr>
-  </table>
 
 </div>
 
 ---
 
-## 📑 Table of Contents
+## Description
 
-- [Implemented Features](#implemented-features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Implemented Built-ins](#implemented-built-ins)
-- [Parsing & Execution](#parsing--execution)
-- [Signals & Error Handling](#signals--error-handling)
-- [Known Issues](#known-issues)
-- [Authors](#authors)
+minishell is a simplified UNIX shell developed in C as part of the 42 curriculum. The project aims to deepen the understanding of how shells work internally by recreating core Bash behavior from scratch.
 
----
+The shell supports:
 
-## ✨ Implemented Features
+- Interactive prompt handling.
+- Parsing and tokenization of user input.
+- Execution of binaries and built-in commands.
+- Pipes and redirections.
+- Environment variable expansion.
+- Signal management.
+- Heredocs.
+- Exit status handling.
 
-The **Mini-Shell** supports the following essential functionalities:
-
-* **Prompt** display in interactive mode.
-* Command line **Parsing**, including:
-    * Quotes (single and double).
-    * Environment variable expansion (`$VAR`).
-* Execution of **simple commands** and **pipelines** (`|`).
-* Support for **redirections** (`>`, `>>`, `<`, `<<`).
-* **Built-in commands** (see section below).
-* Management of **environment variables** (`export`, `unset`, `env`).
-* **Error handling** (syntax, execution, etc.).
-* **Signal handling** for `SIGINT` (Ctrl+C), `SIGQUIT` (Ctrl+\) and *heredoc*.
-* Management of command **exit status** (`$?`).
-* **No memory leaks** (tested with Valgrind).
+The project focuses heavily on process creation, file descriptor management, parsing logic, memory management, and UNIX system calls.
 
 ---
 
-## 💻 Installation
+## Features
+
+### Implemented Functionalities
+
+- Prompt display in interactive mode.
+- Command parsing with support for:
+  - Single quotes (`'`).
+  - Double quotes (`"`).
+  - Environment variable expansion (`$VAR`).
+- Execution of:
+  - Simple commands.
+  - Pipelines (`|`).
+- Support for redirections:
+  - Input (`<`).
+  - Output (`>`).
+  - Append (`>>`).
+  - Heredoc (`<<`).
+- Built-in commands.
+- Environment variable management.
+- Signal handling (`SIGINT`, `SIGQUIT`).
+- Exit status handling (`$?`).
+- Memory leak prevention and cleanup.
+
+---
+
+## Instructions
 
 ### Requirements
 
-* Unix-based system (Linux/macOS).
-* **GCC** compiler (or compatible).
-* **`make`**.
-* **`readline`** library (`libreadline-dev` on Ubuntu).
+- UNIX-based operating system (Linux/macOS).
+- GCC compiler or compatible.
+- `make`.
+- `readline` library.
 
-### Build
+Ubuntu/Debian:
 
 ```sh
-git clone [https://github.com/vinimoura99/Mini-Shell-42.git](https://github.com/vinimoura99)
-cd Mini-Shell-42
+sudo apt install libreadline-dev
+```
+
+### Compilation
+
+Clone the repository and compile the project:
+
+```sh
+git clone https://github.com/jvrs2002/42.minishell
+cd 42.minishell
 make
-````
+```
 
-The executable will be created as **`./minishell`**.
+Available Makefile rules:
 
------
+```sh
+make          # Compile the project
+make clean    # Remove object files
+make fclean   # Remove object files and executable
+make re       # Recompile the project
+```
 
-## 🚀 Usage
+### Execution
 
-Start the shell by running:
+Run the shell:
 
 ```sh
 ./minishell
 ```
 
-You will see a prompt similar to:
+Example usage:
 
+```sh
+jvrs2002@minishell:~/42.minishell$  ls -la
+jvrs2002@minishell:~/42.minishell$  echo hello world
+jvrs2002@minishell:~/42.minishell$  cat file.txt | grep minishell
+jvrs2002@minishell:~/42.minishell$  export MY_VAR=42
+jvrs2002@minishell:~/42.minishell$  echo $MY_VAR
 ```
-minishell$ 
+
+Exit the shell with:
+
+```sh
+exit
 ```
 
-Type commands as you would in Bash:
+or by pressing `Ctrl+D`.
 
-  * **Execute binaries:**
-      `  minishell$ ls -la /tmp  `
-  * **Use pipes:**
-      `  minishell$ ls | grep src  `
-  * **Use redirections:**
-      `  minishell$ echo hello > file.txt   minishell$ cat < file.txt  `
-  * **Use environment variables:**
-      `  minishell$ export MYVAR=42   minishell$ echo $MYVAR  `
+---
 
-Exit with **`exit`**, **`Ctrl+D`**, or by typing `exit <code code>`.
-
------
-
-## 🔧 Implemented Built-ins
-
-The following shell built-in commands are implemented:
+## Implemented Built-ins
 
 | Built-in | Description |
-| :--- | :--- |
-| **`echo`** | Prints arguments to standard output. |
-| **`cd`** | Changes the current working directory. |
-| **`pwd`** | Prints the current working directory. |
-| **`export`** | Sets environment variables. |
-| **`unset`** | Removes environment variables. |
-| **`env`** | Displays environment variables. |
-| **`exit`** | Exits the shell. |
+|---|---|
+| `echo` | Prints arguments to standard output. |
+| `cd` | Changes the current working directory. |
+| `pwd` | Displays the current working directory. |
+| `export` | Creates or updates environment variables. |
+| `unset` | Removes environment variables. |
+| `env` | Displays environment variables. |
+| `exit` | Exits the shell. |
 
------
+---
 
-## ⚙️ Parsing & Execution
+## Parsing & Execution
 
-The shell's core is divided into three main modules:
+### Lexer
 
-  * **Lexer**:
-      * Scans and tokenizes user input, correctly handling quotes, escape characters, and special symbols (like `|`, `>`, `<`).
-  * **Parser**:
-      * Constructs an internal representation (like an **Abstract Syntax Tree**) from the tokens, supporting pipelines, redirections, and performing environment variable expansion.
-      * Detects and reports syntax errors comprehensively.
-  * **Executor**:
-      * Executes commands: built-ins internally and external programs using `fork` and `execve`.
-      * Establishes **pipes** and sets up file descriptors for **redirections** and *heredocs*.
-      * Manages file creation and verifies access permissions.
-      * Cleans up resources and restores the shell state after execution.
+The lexer scans user input and transforms it into tokens while handling:
 
------
+- Quotes.
+- Special characters.
+- Pipes.
+- Redirections.
+- Environment variables.
 
-## 🚥 Signals & Error Handling
+### Parser
 
-  * **`SIGINT` (Ctrl+C)**: Interrupts the current command or clears the prompt.
-  * **`SIGQUIT` (Ctrl+)**: Ignored in interactive mode, handled in the child process.
-  * **Heredoc**: Handles `SIGINT` to safely interrupt input.
-  * **Exit Codes**: Mini-Shell maintains the command **exit status**, consistent with Bash whenever possible.
+The parser organizes tokens into executable structures, validating syntax and preparing commands for execution.
 
------
+### Executor
 
-## ⚠️ Known Issues
+The executor:
 
-The following functionalities are not implemented or may behave differently from Bash:
+- Executes built-ins internally.
+- Executes external programs using `fork()` and `execve()`.
+- Handles pipes and redirections.
+- Manages file descriptors.
+- Restores shell state after execution.
 
-  * **Wildcard expansion** (`*`, `?`, `[]`) is not implemented.
-  * Logical operators (`&&`, `||`) are not implemented.
-  * Some advanced Bash features (subshells, process substitution, etc.) are out of scope.
-  * May behave differently in edge cases (such as `export` without arguments).
+---
 
------
+## Signals & Error Handling
 
-## 👥 Authors
+- `SIGINT` (`Ctrl+C`) interrupts the current process.
+- `SIGQUIT` (`Ctrl+\\`) is ignored in interactive mode.
+- Heredoc interruption is handled safely.
+- Syntax and execution errors are reported similarly to Bash whenever possible.
+- Exit codes are preserved through `$?`.
 
-  * [vinimoura99](https://github.com/vinimoura99)
-  * [jvrs2002](https://github.com/jvrs2002)
- 
+---
 
-<!-- end list -->
+## Resources
+
+### Documentation & References
+
+- GNU Bash Documentation:
+  - https://www.gnu.org/software/bash/manual/bash.html
+
+- Linux Man Pages:
+  - https://man7.org/linux/man-pages/
+
+- POSIX Shell Command Language:
+  - https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html
+
+- Readline Library Documentation:
+  - https://tiswww.case.edu/php/chet/readline/rltop.html
+
+- Beej's Guide to UNIX IPC:
+  - https://beej.us/guide/bgipc/
+
+### AI Usage
+
+Artificial Intelligence tools were used during the development of this project for:
+
+- Clarifying concepts related to UNIX processes and signals.
+- Understanding parsing strategies and shell behavior.
+- Reviewing edge cases and debugging ideas.
+- Improving documentation and README structure.
+
+---
+
+## Authors
+
+- GitHub: https://github.com/jvrs2002
+- GitHub: https://github.com/vinimoura99
